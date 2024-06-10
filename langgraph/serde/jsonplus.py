@@ -8,9 +8,8 @@ from uuid import UUID
 
 from langchain_core.load.load import Reviver
 from langchain_core.load.serializable import Serializable
-from langchain_core.pydantic_v1 import BaseModel as LcBaseModel
-from pydantic import BaseModel
 
+from langgraph.constants import Send
 from langgraph.serde.base import SerializerProtocol
 
 LC_REVIVER = Reviver()
@@ -37,14 +36,10 @@ class JsonPlusSerializer(SerializerProtocol):
     def _default(self, obj):
         if isinstance(obj, Serializable):
             return obj.to_json()
-        elif isinstance(obj, (BaseModel, LcBaseModel)):
-            # prefer non-deprecated method if available
-            if hasattr(obj, "model_dump"):
-                return self._encode_constructor_args(
-                    obj.__class__, kwargs=obj.model_dump()
-                )
-            else:
-                return self._encode_constructor_args(obj.__class__, kwargs=obj.dict())
+        elif hasattr(obj, "model_dump") and callable(obj.model_dump):
+            return self._encode_constructor_args(obj.__class__, kwargs=obj.model_dump())
+        elif hasattr(obj, "dict") and callable(obj.dict):
+            return self._encode_constructor_args(obj.__class__, kwargs=obj.dict())
         elif isinstance(obj, UUID):
             return self._encode_constructor_args(UUID, args=[obj.hex])
         elif isinstance(obj, (set, frozenset)):
@@ -69,6 +64,10 @@ class JsonPlusSerializer(SerializerProtocol):
             )
         elif isinstance(obj, Enum):
             return self._encode_constructor_args(obj.__class__, args=[obj.value])
+        elif isinstance(obj, Send):
+            return self._encode_constructor_args(
+                obj.__class__, kwargs={"node": obj.node, "arg": obj.arg}
+            )
         else:
             raise TypeError(
                 f"Object of type {obj.__class__.__name__} is not JSON serializable"
@@ -96,7 +95,9 @@ class JsonPlusSerializer(SerializerProtocol):
         return LC_REVIVER(value)
 
     def dumps(self, obj: Any) -> bytes:
-        return json.dumps(obj, default=self._default, sort_keys=True).encode()
+        return json.dumps(obj, default=self._default, ensure_ascii=False).encode(
+            "utf-8", "ignore"
+        )
 
     def loads(self, data: bytes) -> Any:
         return json.loads(data, object_hook=self._reviver)

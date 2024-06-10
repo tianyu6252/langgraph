@@ -1,5 +1,6 @@
 # 🦜🕸️LangGraph
 
+![Version](https://img.shields.io/pypi/v/langgraph)
 [![Downloads](https://static.pepy.tech/badge/langgraph/month)](https://pepy.tech/project/langgraph)
 [![Open Issues](https://img.shields.io/github/issues-raw/langchain-ai/langgraph)](https://github.com/langchain-ai/langgraph/issues)
 [![](https://dcbadge.vercel.app/api/server/6adMQxSpJS?compact=true&style=flat)](https://discord.com/channels/1038097195422978059/1170024642245832774)
@@ -491,6 +492,10 @@ We recommend starting with the [Introduction to LangGraph](https://langchain-ai.
 ### How-to Guides
 
 The [LangGraph how-to guides](https://langchain-ai.github.io/langgraph/how-tos/) show how to accomplish specific things within LangGraph, from streaming, to adding memory & persistence, to common design patterns (branching, subgraphs, etc.), these are the place to go if you want to copy and run a specific code snippet.
+
+### Conceptual Guides
+
+The [Conceptual Guides](https://langchain-ai.github.io/langgraph/concepts/) provide in-depth explanations of the key concepts and principles behind LangGraph, such as nodes, edges, state and more.
 
 ### Reference
 
